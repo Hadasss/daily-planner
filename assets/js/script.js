@@ -42,11 +42,11 @@ for (i = 0; i < tempSlotsArr.length; i++) {
   newBtn.innerHTML = "<i class='fas fa-save'</i>";
 
   if (moment().format("k") > i + 7) {
-    newTextA.attr("class", "list-group-item box past col-10");
+    newTextA.attr("class", "text list-group-item box past col-10");
   } else if (moment().format("k") < i + 7) {
-    newTextA.attr("class", "list-group-item box textarea future col-10");
+    newTextA.attr("class", "text list-group-item box textarea future col-10");
   } else {
-    newTextA.attr("class", "list-group-item box present col-10");
+    newTextA.attr("class", "text list-group-item box present col-10");
   }
 
   newBtn.on("click", saveToLocal);
