@@ -25,5 +25,7 @@ WHEN I refresh the page
 THEN the saved events persist
 
 ## Screenshot
+![image](https://user-images.githubusercontent.com/80355222/151680616-5e0e09bc-e7bf-416d-9730-2c885b1be756.png)
+
 
 ## Link to live deployment
