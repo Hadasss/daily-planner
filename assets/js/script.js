@@ -1,96 +1,80 @@
 let currentDay = document.querySelector("#currentDay");
-const container = document.querySelector(".container");
-const hourColumnUl = document.querySelector(".hour-column");
-let hour = document.querySelector(".box hour");
-const slotsColumnUl = document.querySelector(".slot-column");
-let slotItemLi = document.querySelector(".slot");
-const saveBtnColumn = document.querySelector(".save-btn-column");
-let saveBtnLi = document.querySelector(".saveBtn");
-const timeSlots = document.querySelectorAll(".slot");
-let textP = document.querySelector(".text-p");
-let textPId = document.querySelector(".text-p").getAttribute("id");
-let textarea = document.createElement("textarea");
+let tempSlotsArr = [];
 
-let slotsObj = {};
+currentDay.textContent = moment().format("MMM Do YYYY HH:00");
 
-// main function
-const displayCalendar = function () {
-  currentDay.textContent = moment().format("MMM Do YYYY HH:MM");
-  slotColorCheck();
-  loadSlots();
-  setInterval(function () {
-    slotColorCheck();
-  }, 1000 * 60 * 30);
-};
+let slots = localStorage.getItem("storedSlotsArr");
 
-const slotColorCheck = function () {
-  // color-coding slots
-  timeSlots.forEach((slotItemLi) => {
-    let slotTimeId = $(slotItemLi).attr("id");
+if (!slots) {
+  console.log("No slots");
+  tempSlotsArr = [
+    { hour: "7:00", text: "" },
+    { hour: "8:00", text: "" },
+    { hour: "9:00", text: "" },
+    { hour: "10:00", text: "" },
+    { hour: "11:00", text: "" },
+    { hour: "12:00", text: "" },
+    { hour: "13:00", text: "" },
+    { hour: "14:00", text: "" },
+    { hour: "15:00", text: "" },
+    { hour: "16:00", text: "" },
+    { hour: "17:00", text: "" },
+    { hour: "18:00", text: "" },
+  ];
+} else {
+  tempSlotsArr = JSON.parse(slots);
+}
 
-    if (moment().format("k") > parseInt(slotTimeId)) {
-      $(slotItemLi).addClass("past");
-    } else if (moment().format("k") < slotTimeId) {
-      $(slotItemLi).addClass("future");
-    } else {
-      $(slotItemLi).addClass("present");
-    }
-  });
-};
+for (i = 0; i < tempSlotsArr.length; i++) {
+  let timeId = parseInt(tempSlotsArr[i].hour);
+  const newRow = $("<div>").attr("class", "row");
 
-// TODO (BUG) display night as future
-// TODO enable text change in slot on click
-$(".slot").on("click", function (event) {
-  // let targetId = event.target.id;
-  // let currentSlotLi = event.target;
-  // let currentTextarea = currentSlotLi.textContent;
-  // console.log(targetId);
-  // console.log(currentSlotLi);
+  const newP = $("<p>")
+    .attr("class", "list-group-item box hour col-1")
+    .text(tempSlotsArr[i].hour);
+  let newTextA = $("<textarea>").attr("data-hour", tempSlotsArr[i].hour);
+  newTextA.val(tempSlotsArr[i].text);
 
-  // $(currentSlotLi).append(textarea);
-  // console.log(currentTextarea);
-  // $("textarea").addClass("textarea");
-  // textarea.textContent = textP.textContent;
+  const newBtn = $("<button>")
+    .attr("class", "list-group-item box saveBtn col-1")
+    .attr("data-hour", tempSlotsArr[i].hour)
+    .text("Save");
 
-  // let updatedTextarea = $(textarea).val();
-  // console.log(textarea.textContent);
-  // // BUG next line changes sets the id of first slot to event.target.id
-  // // let updatedSlotId = slotItemLi.setAttribute("id", targetId);
-
-  // // $(textPId).replaceWith($(textarea));
-
-  // saveSlotText();
-
-  let pValue = $(event.target).closest("p").text();
-  let textArea = $("<textarea>").val(pValue);
-  $(event.target).append(textArea);
-
-  console.log(pValue);
-  console.log($(textArea).val());
-  $(textP).replaceWith(textArea);
-});
-
-$(".slot").on("blur", function (event) {
-  //
-});
-
-// save slotText to localStirage
-const saveSlotText = function () {
-  localStorage.setItem("slotsObj", JSON.stringify(slotsObj));
-};
-
-// TODO save slot to localStorage
-const loadSlots = function () {
-  slotsObj = JSON.parse(localStorage.getItem(slotsObj));
-
-  if (!slotsObj) {
-    slotsObj = {
-      hour: "", // should be slot id
-      text: "", // should be $(textarea).val()
-    };
+  if (moment().format("k") > i + 7) {
+    newTextA.attr("class", "list-group-item box past col-10");
+  } else if (moment().format("k") < i + 7) {
+    newTextA.attr("class", "list-group-item box textarea future col-10");
+  } else {
+    newTextA.attr("class", "list-group-item box present col-10");
   }
 
-  // TODO loop over slots object to display existing slots
-};
+  newBtn.on("click", saveToLocal);
 
-displayCalendar();
+  newRow.append(newP);
+  newRow.append(newTextA);
+  newRow.append(newBtn);
+
+  $(".container").append(newRow);
+}
+
+function saveToLocal(event) {
+  console.log($(this).prev().val());
+  const value = $(this).prev().val();
+  console.log($(this).prev().prev().text());
+  // const key = $(this).prev().prev().text();
+  const key = $(this).attr("data-hour");
+  console.log(key);
+
+  for (i = 0; i < tempSlotsArr.length; i++) {
+    console.log(tempSlotsArr[i]);
+    if (tempSlotsArr[i].hour === key) {
+      tempSlotsArr[i].text = value;
+      console.log(tempSlotsArr[i]);
+      break;
+    }
+  }
+
+  console.log(tempSlotsArr);
+
+  localStorage.setItem("storedSlotsArr", JSON.stringify(tempSlotsArr));
+}
